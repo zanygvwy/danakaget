@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Update Link Dana Kaget</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-md w-full bg-slate-800 rounded-2xl p-6 shadow-xl border border-slate-700">
+    <h1 class="text-xl font-bold mb-4">Update Dana Kaget Harian</h1>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm text-slate-400 mb-1">Secret Key / Sandi Admin</label>
+        <input type="password" id="secretKey" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Masukkan password admin">
+      </div>
+
+      <div>
+        <label class="block text-sm text-slate-400 mb-1">URL Dana Kaget Baru</label>
+        <input type="url" id="linkUrl" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="https://link.dana.id/kaget?c=...">
+      </div>
+
+      <div>
+        <label class="block text-sm text-slate-400 mb-1">Keterangan / Catatan</label>
+        <input type="text" id="note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Contoh: Kuota 50 Orang!">
+      </div>
+
+      <button onclick="submitLink()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition">
+        Simpan Link Hari Ini
+      </button>
+
+      <p id="statusMsg" class="text-sm text-center mt-2"></p>
+    </div>
+  </div>
+
+  <script>
+    async function submitLink() {
+      const secret = document.getElementById('secretKey').value;
+      const link = document.getElementById('linkUrl').value;
+      const note = document.getElementById('note').value;
+      const msg = document.getElementById('statusMsg');
+
+      msg.innerText = 'Menyimpan...';
+      msg.className = 'text-sm text-center mt-2 text-slate-400';
+
+      try {
+        const res = await fetch('/api/links', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${secret}`
+          },
+          body: JSON.stringify({ link, note })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          msg.innerText = 'Berhasil memperbarui link!';
+          msg.className = 'text-sm text-center mt-2 text-emerald-400';
+          document.getElementById('linkUrl').value = '';
+        } else {
+          msg.innerText = data.error || 'Gagal memperbarui';
+          msg.className = 'text-sm text-center mt-2 text-rose-400';
+        }
+      } catch (err) {
+        msg.innerText = 'Terjadi kesalahan jaringan';
+        msg.className = 'text-sm text-center mt-2 text-rose-400';
+      }
+    }
+  </script>
+</body>
+</html>
